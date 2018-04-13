@@ -9,7 +9,7 @@ const OUTDIR=path.join(TOPDIR,"output");
 const DATADIR=path.join(TOPDIR,"data");
 const TEMPLATEDIR=path.join(TOPDIR,"style");
 
-const TEMPLATEFILES = [ "header.html", "footer.html" ];
+const TEMPLATEFILES = [ "header.html", "footer.html", "map.html" ];
 
 let gTemplates = {};
 let gStringData = {};
@@ -369,11 +369,25 @@ function render(filter, groups)
     generateSchoolPage(schoolList, parentDir);
 }
 
+function renderMap()
+{
+    let filename = path.join(OUTDIR, "map.html");
+
+    // build a JSON array of room assignments
+
+    gStringData['_rooms_'] = "";
+
+    let s = renderTemplate(gTemplates['map.html'], gStringData);
+
+    fs.writeFileSync(filename, s);
+
+}
+
 function generateChallengeIndex(challengeGroups, parentDir)
 {
     let filename = parentDir + "/index.htm";
 
-    let pageTitle = gStringData['TitleMain'];
+    let pageTitle = gStringData['TitleMain'] + " " + gStringData['EventYear'];
     let s = renderHeaderTemplate(pageTitle);
 
     s += "<div style='text-align: center;font-weight:bold'>Welcome to the " + gStringData.EventYear + " " + gStringData.TournamentTitle + "</div>";
@@ -982,5 +996,7 @@ schedRows = loadSchedule(path.join(DATADIR,'schedfinal.csv'));
 let filter = {challenge:null, panel:null, team:null, school: null};
 
 filterAndRender(schedRows, filter);
+
+renderMap();
 
 process.exit(0);

@@ -1,0 +1,120 @@
+<html>
+<head>
+  <title>Site Map : {{EventYear}} DI {{GeoArea}}</title>
+  <style type="text/css">
+  div.container {width:100vh;}
+  #spotlight {
+    display:none;
+    left:75vw;
+    top:0vw;
+    width:8vw;
+    height:8vw;
+    position:relative;
+    border:0.4em solid rgba(255,0,0,0.6);
+    background-color:rgba(255,255,0,0.20)
+  }
+  #locname { font-weight:bold; margin-left:10px }
+  body,input {font-family: 'helvetica';}
+  button { background-color: #eee; border:0.15em solid black; margin-left:0.25em;}
+
+  @media only screen and (max-device-width : 800px) and (orientation : portrait) {
+    body,button {font-size: 4vw; }
+  }
+  @media only screen and (max-device-width : 800px) and (orientation : landscape) {
+    body,button {font-size: 4vh; }
+  }
+
+  @media only screen and (orientation : portrait) {
+    div.container {width:auto}
+  }
+  @media only screen and (orientation : landscape) {
+  }
+  </style>
+  <script language="javascript">
+  var loc=false;
+  var locs={
+    {{_rooms_}}
+  };
+  //
+  var ratio = 1926.0 / 1868.0; // based on combined map pixel ratio width/height
+  function Scale(left, top) {
+    var isLandscape = (window.innerWidth > window.innerHeight);
+    var spotlight = document.getElementById('spotlight');
+    var units = 'vw';
+    if (isLandscape) {
+      units = 'vh';
+    }
+    spotlight.style.width = '8' + units;
+    spotlight.style.height = '8' + units;
+
+    if (isLandscape) {
+      retval = [ Math.round(left * ratio) + 'vh', Math.round(top * ratio) + 'vh'];
+    } else {
+      retval = [ left + 'vw', top + 'vw'];
+    }
+    return retval;
+  }
+  function clearSpotlight() {
+    loc = false;
+    document.getElementById('spotlight').style.display='none';
+    document.getElementById('spotlight-specifics').style.display='none';
+  }
+
+  function locname(locid) {
+    return locid;
+  }
+  function drawSpotlight() {
+    var pos = locs[loc];
+    if (pos) {
+      document.getElementById('spotlight-specifics').style.display='block';
+      document.getElementById('locname').innerHTML=locname(loc);
+
+      scaledPos = Scale(pos[0],pos[1]);
+      spotlight.style.left = scaledPos[0];
+      spotlight.style.top = scaledPos[1];
+      spotlight.style.display = 'block';
+
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id='spotlight-specifics' style='display:none'>
+    Spotlight on : <span id='locname'>&nbsp;</span>
+    <button onclick='javascript:clearSpotlight();'>Clear</button>
+  </div>
+  <div class='container'>
+    <div id='mapdiv'>
+      <img src="images/{{MapImageName}}" border=0 width='100%'>
+    </div>
+    <div id='spotlight' width='100%'></div>
+  </div>
+
+<script language='javascript'>
+var urlParams;
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+
+    if (urlParams["loc"]) {
+      loc = urlParams["loc"];
+
+      drawSpotlight();
+    }
+
+    window.onresize = function(){
+      //location.reload();
+      //window.body.scrollIntoView();
+      if (loc)      drawSpotlight();
+    };
+})();
+</script>
+</body>
+</html>

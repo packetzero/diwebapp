@@ -1,8 +1,9 @@
 {
   "EventYear":"2019",
   "EventDate":"March 3 2019",
-  "TournamentTitle":"Capital Region Tournament",
-  "TitleMain":"DI Region Tournament 2018",
+  "GeoArea":"Capital Region",
+  "TitleMain":"DI Region Tournament",
   "TitlePrefixMisc":"DI Region - ",
-  "TitlePrefixTeam":"DI Team - "
+  "TitlePrefixTeam":"DI Team - ",
+  "MapImageName":"map.jpg"
 }
