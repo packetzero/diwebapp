@@ -1,0 +1,9 @@
+{
+  "name": "digenerator",
+  "version": "1.0.0",
+  "description": "Generates static HTML files for event schedule and map",
+  "main": "build.js",
+  "dependencies": {
+    "underscore": "^1.8.3"
+  }
+}
