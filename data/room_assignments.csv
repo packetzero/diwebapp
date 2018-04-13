@@ -1,0 +1,16 @@
+TempWorkingName,RoomID,ActualName,BuildingLevel,MapX,MapY,
+IC Check In,L1_EASTPF,East Entrance Hallway,Level 1,0,0
+Rising Stars Check In,L1_NORTH,North Hallway,Level 1,0,0
+Structure Weigh In,L2_NORTH,North Hallway,Level 2,0,0
+EXTREME,L3_TIMPAN,TimPanogos Terrace,Level 3,0,0
+TC Friends RS-T,L1_EXHCL,Exhibit Hall C Left,Level 1,0,0
+TC Friends RS-E,L1_EXHCC,Exhibit Hall C Center,Level 1,0,0
+TC Friends RS-X,L1_EXHCR,Exhibit Hall C Right,Level 1,0,0
+TC Inside EL ML,L3_SOLCRK,Soldier Creek Room,Level 3,0,0
+TC Drop EL ML,L3_BATCRK,Battle Creek Room,Level 3,0,0
+TC Drop EL ML 2,L3_SILCRK,Silver Creek Room,Level 3,0,0
+TC Treasure EL ML SL UL,L3_HOBCRK,Hobble Creek Room,Level 3,0,0
+TC Rm236 Change EL,L3_BR,Board Room,Level 3,0,0
+TC Rm240 Change ML SL,L3_CASB,Cascade B,Level 3,0,0
+TC Unlikely EL ML,L3_SOLCRK,Soldier Creek Room,Level 3,0,0
+TC NGC PE GYM Maze EL ML SL,L2_BALLB,Ballroom B,Level 2,0,0

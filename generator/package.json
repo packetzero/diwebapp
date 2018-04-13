@@ -4,6 +4,7 @@
   "description": "Generates static HTML files for event schedule and map",
   "main": "build.js",
   "dependencies": {
+    "npm": "^5.8.0",
     "underscore": "^1.8.3"
   }
 }

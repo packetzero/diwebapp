@@ -1,17 +1,31 @@
 
-var mapChallenges={};
-var mapRooms={};
+const path = require('path');
+const fs = require('fs');
+const _ = require('underscore');
+_.templateSettings.interpolate = /\{\{(.+?)\}\}/g;
 
-var schoolList = [];
-var schoolMap = {};
+const TOPDIR=path.resolve(__dirname, '..');
+const OUTDIR=path.join(TOPDIR,"output");
+const DATADIR=path.join(TOPDIR,"data");
+const TEMPLATEDIR=path.join(TOPDIR,"style");
+
+const TEMPLATEFILES = [ "header.html", "footer.html" ];
+
+let gTemplates = {};
+let gStringData = {};
+let mapChallenges={};
+let mapRooms={};
+
+let schoolList = [];
+let schoolMap = {};
 
 
-var emoBalance = "&#x2696;";
-var emoHourglass = "&#x23F3;";
-var emoAction = "&#x1F3AC;";
-var emoLightbulb = "&#x1F4A1;";
-var emoPage = "&#x1F4C4;";
-var emoMap = "&#x1F5FA;";
+const emoBalance = "&#x2696;";
+const emoHourglass = "&#x23F3;";
+const emoAction = "&#x1F3AC;";
+const emoLightbulb = "&#x1F4A1;";
+const emoPage = "&#x1F4C4;";
+const emoMap = "&#x1F5FA;";
 
 // ref: http://stackoverflow.com/a/1293163/2343
 // This will parse a delimited string into an array of
@@ -23,7 +37,7 @@ function CSVToArray( strData, strDelimiter ){
     strDelimiter = (strDelimiter || ",");
 
     // Create a regular expression to parse the CSV values.
-    var objPattern = new RegExp(
+    let objPattern = new RegExp(
         (
             // Delimiters.
             "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
@@ -40,11 +54,11 @@ function CSVToArray( strData, strDelimiter ){
 
     // Create an array to hold our data. Give the array
     // a default empty first row.
-    var arrData = [[]];
+    let arrData = [[]];
 
     // Create an array to hold our individual pattern
     // matching groups.
-    var arrMatches = null;
+    let arrMatches = null;
 
 
     // Keep looping over the regular expression matches
@@ -52,7 +66,7 @@ function CSVToArray( strData, strDelimiter ){
     while (arrMatches = objPattern.exec( strData )){
 
         // Get the delimiter that was found.
-        var strMatchedDelimiter = arrMatches[ 1 ];
+        let strMatchedDelimiter = arrMatches[ 1 ];
 
         // Check to see if the given delimiter has a length
         // (is not the start of string) and if it matches
@@ -69,7 +83,7 @@ function CSVToArray( strData, strDelimiter ){
 
         }
 
-        var strMatchedValue;
+        let strMatchedValue;
 
         // Now that we have our delimiter out of the way,
         // let's check to see which kind of value we
@@ -101,8 +115,6 @@ function CSVToArray( strData, strDelimiter ){
 }
 
 
-var fs = require('fs');
-
 function sortByTCTime(a, b) {
     return a.tctime - b.tctime;
 }
@@ -118,10 +130,10 @@ function sortByEventTime(a,b) { return a.timeVal - b.timeVal; }
 function parseTime(str)
 {
     if (str == 'undefined' || str == null) return 0;
-    var a = str.split(':');
+    let a = str.split(':');
     if (a.length < 2) return 0;
-    var hour = parseInt(a[0]);
-    var min = parseInt(a[1]);
+    let hour = parseInt(a[0]);
+    let min = parseInt(a[1]);
 
     if (a[1].indexOf('PM') > 0 && hour < 12) {
         hour += 12;  // 1 -> 13
@@ -135,25 +147,11 @@ const EVT_INSTANT_CHALLENGE = 2;
 const EVT_STRUCTURE_CHECKIN = 3;
 const EVT_PERF_CHECKIN      = 4;
 
-// for roomid='ll_rm161', will return 'RM161 on Lower Level'
-function getRoomLabel(roomid)
-{
-    var parts = roomid.split('_');
-    if (parts.length != 2) return roomid;
-    var levelName='';
-    switch(parts[0].toLowerCase()) {
-        case 'll': levelName = "Lower Level"; break;
-        case 'ml': levelName = "Main Level"; break;
-        default:
-            return roomid;
-    }
-    return parts[1].toUpperCase() + " on " + levelName;
-}
 
 //ICRoom	Active	Competitive	Chall Letter	Lvl only	Level	School	Town	Membership Name	TCRoom	Manager	TeamNum	ICTime	TCTime	Challenge
 function Team(cols)
 {
-    var i=0;
+    let i=0;
 
     if (cols.length < 6) {
         this.teamid = 0;
@@ -161,14 +159,14 @@ function Team(cols)
     }
     i++; // ICRoom
 
-    var isActive = cols[i++]; // Active
+    let isActive = cols[i++]; // Active
     if (isActive.trim() !== 'A') { this.teamid=0; return; }
 
     i++; // competitive
 
     this.challengeid = cols[i++];
     this.level = cols[i++];
-    var tmp = cols[i++].split('-');
+    let tmp = cols[i++].split('-');
     if (tmp.length > 1)
         this.panel = tmp[1];
 
@@ -185,14 +183,14 @@ function Team(cols)
     this.teamid = cols[i++];
 
     this.ictime = GetSchedTime(EVT_INSTANT_CHALLENGE, cols[i++], this);
-    var tctimeRaw = cols[i++];
+    let tctimeRaw = cols[i++];
     this.tctime = GetSchedTime(EVT_TEAM_CHALLENGE, tctimeRaw, this);
 
     if (this.challengeid === 'X') {
         checkInDelta = 115;
         this.perfCheckingTime = GetSchedTimeInt(EVT_PERF_CHECKIN, this.tctime.timeVal - checkInDelta, this);
     } else {
-        var checkInDelta = 20;
+        let checkInDelta = 20;
         if (this.challengeid === 'R' || this.challengeid === 'RS') checkInDelta = 15;
         this.perfCheckingTime = GetSchedTimeInt(EVT_PERF_CHECKIN, this.tctime.timeVal - checkInDelta, this);
 //        this.perfCheckingTime.timeVal -= checkInDelta;
@@ -237,8 +235,8 @@ function Team(cols)
     // sometimes teams don't have a name.  no error here, handle at render time
 
     if (this.tctime != null) {
-        this.tctime.loc = getRoomLabel(this.room);
-        this.tctime.mapLink = "/map.html?loc=" + this.room;
+        this.tctime.loc = this.room.label;
+        this.tctime.mapLink = "/map.html?loc=" + this.room.id;
     }
 
     return this;
@@ -256,7 +254,7 @@ function SchedTime(eventType, timeStr, team, timeVal)
 
 function GetSchedTime(eventType, timeStr, team)
 {
-    var timeVal = parseTime(timeStr);
+    let timeVal = parseTime(timeStr);
     if (timeVal)
         return new SchedTime(eventType, timeStr, team, timeVal);
     return null;
@@ -264,7 +262,7 @@ function GetSchedTime(eventType, timeStr, team)
 
 function GetSchedTimeInt(eventType, timeVal, team)
 {
-    var timeStr= formatTime(timeVal);
+    let timeStr= formatTime(timeVal);
     return new SchedTime(eventType, timeStr, team, timeVal);
 }
 
@@ -274,7 +272,7 @@ function filterRow(row, filter)
         if (row.challenge.toLowerCase().indexOf(filter.challenge.toLowerCase()) < 0) return true;
     }
     if (filter.team) {
-        var s = (row.teamid + ' ' + row.teamname).toLowerCase();
+        let s = (row.teamid + ' ' + row.teamname).toLowerCase();
         if (s.indexOf(filter.team.toLowerCase()) < 0) return true;
     }
     if (filter.panel) {
@@ -284,7 +282,7 @@ function filterRow(row, filter)
 }
 
 
-var challengeGroups = [];
+let challengeGroups = [];
 
 function ChallengeSection(group) {
     this.name = group.challengeObj.name;
@@ -306,8 +304,8 @@ function LevelLink(group)
 //   etc.
 function addGroupLink(group)
 {
-    var cidx = group.challengeObj.index;
-    var levelIdx = levelIndexes[group.level];
+    let cidx = group.challengeObj.index;
+    let levelIdx = levelIndexes[group.level];
 
     if (!challengeGroups[cidx]) {
         challengeGroups[cidx] = new ChallengeSection(group);
@@ -318,72 +316,73 @@ function addGroupLink(group)
 
 function render(filter, groups)
 {
-    var parentDir = "../webapp";
+    // ensure output directories created
 
-    var dir = parentDir + "/tc";
+    let parentDir = OUTDIR;
+    if (!fs.existsSync(parentDir)) fs.mkdirSync(parentDir);
+
+    let dir = path.join(OUTDIR, "tc");
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
-    dir = parentDir + "/teams";
+    dir = path.join(OUTDIR, "teams");
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
-    var headerStr = fs.readFileSync("header.html").toString();
-    var footerStr = fs.readFileSync("footer.html").toString();
-
-//    var teamDetailsFooterStr = "<div class=TeamDetailsFooter>Capital Region</div>";
-
-    for (var i=0; i < groups.length; i++)
+    for (let i=0; i < groups.length; i++)
     {
-        var group = groups[i];
+        let group = groups[i];
 
 
-        var filename = parentDir + group.path;
+        let filename = parentDir + group.path;
 
         addGroupLink(group);
 
-        var s = headerStr.replace('_TITLE_','DI Region - ' + group.name);
+        let pageTitle = gStringData['TitlePrefixMisc'] + group.name;
+        let s = renderHeaderTemplate(pageTitle);
 
         s += renderGroup(group, filter);
 
         s += "<BR>";
 
-        s += footerStr;
+        s += renderFooterTemplate();
 
         fs.writeFileSync(filename, s);
 
         // render a page for each team
 
-        for (var j=0; j < group.rows.length; j++) {
-            var team = group.rows[j];
-            filename = parentDir + "/teams/" + team.teamid + ".htm";
+        for (let j=0; j < group.rows.length; j++) {
+            let team = group.rows[j];
+            filename = path.join(parentDir,"teams", team.teamid + ".htm");
 
-            var s = headerStr.replace('_TITLE_','DI Team - ' + team.teamid);
+            let pageTitle = gStringData['TitlePrefixTeam'] + team.teamid;
+            let s = renderHeaderTemplate(pageTitle);
 
             s += renderTeamDetails(team);
 
-            s += footerStr;
+            s += renderFooterTemplate();
 
             fs.writeFileSync(filename, s);
         }
     }
 
-    generateChallengeIndex(challengeGroups, parentDir, headerStr, footerStr);
+    generateChallengeIndex(challengeGroups, parentDir);
 
-    generateSchoolPage(schoolList, parentDir, headerStr, footerStr);
+    generateSchoolPage(schoolList, parentDir);
 }
 
-function generateChallengeIndex(challengeGroups, parentDir, headerStr, footerStr)
+function generateChallengeIndex(challengeGroups, parentDir)
 {
-    var filename = parentDir + "/index.htm";
+    let filename = parentDir + "/index.htm";
 
-    var s = headerStr.replace('_TITLE_','DI Region Tournament 2018');
+    let pageTitle = gStringData['TitleMain'];
+    let s = renderHeaderTemplate(pageTitle);
 
-    s += "<div style='text-align: center;font-weight:bold'>Welcome to the 2018 Capital Region Tournament</div>";
+    s += "<div style='text-align: center;font-weight:bold'>Welcome to the " + gStringData.EventYear + " " + gStringData.TournamentTitle + "</div>";
 
     s += "<div class='GroupHeader'>Schedule - By Challenge and Level</div>";
 
-    for (var i=0;i < challengeGroups.length; i++) {
-        var chal = challengeGroups[i];
-        var iconurl = "/images/" + chal.icon;
+    for (let i=0;i < challengeGroups.length; i++) {
+        let chal = challengeGroups[i];
+        let iconurl = "/images/" + chal.icon;
         s += "<div style='clear:both'>";
         s += "<img border='0' style='height:4em;float:left' src='" + iconurl + "'>" ;
 
@@ -394,8 +393,8 @@ function generateChallengeIndex(challengeGroups, parentDir, headerStr, footerStr
         s += "</div>";
 
 
-        for (var j=0;j < 6;j++) {
-            var level = chal.levels[j];
+        for (let j=0;j < 6;j++) {
+            let level = chal.levels[j];
             if (level) {
                 s += "<a class='ChalBtn' href='" + level.path + "'>" + level.name + " " +
                     "<div class='LevelCount'> (" + level.num + ")</div></a>";
@@ -420,7 +419,7 @@ function generateChallengeIndex(challengeGroups, parentDir, headerStr, footerStr
 
 
     s += "<BR>";
-    s += footerStr;
+    s += renderFooterTemplate();
     fs.writeFileSync(filename, s);
 
 }
@@ -429,19 +428,20 @@ function sortByName(a, b) {
     return a.name.localeCompare(b.name);
 }
 
-function generateSchoolPage(schoolList, parentDir, headerStr, footerStr)
+function generateSchoolPage(schoolList, parentDir)
 {
-    var filename = parentDir + "/schools.htm";
+    let filename = parentDir + "/schools.htm";
 
-    var s = headerStr.replace('_TITLE_','DI Region - Schools');
+    let pageTitle = gStringData['TitlePrefixMisc'] + 'Schools';
+    let s = renderHeaderTemplate(pageTitle);
 
     s += "<div class='GroupHeader'>List of Teams by School</div>";
 
-    var schools = schoolList.sort(sortByName);
+    let schools = schoolList.sort(sortByName);
 
-    for (var i=0;i < schools.length; i++) {
-        var school = schools[i];
-        var schoolName = school.name;
+    for (let i=0;i < schools.length; i++) {
+        let school = schools[i];
+        let schoolName = school.name;
         if (school.name.trim() == '') schoolName = " (school name unknown) ";
 
         s += "<div style='clear:both'>";
@@ -451,18 +451,18 @@ function generateSchoolPage(schoolList, parentDir, headerStr, footerStr)
         s += "<table border=0>";
 
 
-        for (var level in school.levels) {
-            var teams = school.levels[level];
+        for (let level in school.levels) {
+            let teams = school.levels[level];
             if (!teams) {
                 continue;
             }
             teams = teams.sort(sortByName);
 
-            for (var k=0; k < teams.length;k++)
+            for (let k=0; k < teams.length;k++)
             {
-                var team = teams[k];
-                var path = "/teams/" + team.teamid + ".htm";
-                var name = team.name;
+                let team = teams[k];
+                let path = "/teams/" + team.teamid + ".htm";
+                let name = team.name;
                 if (name == '') {
                     name = team.teamid + " (" + team.challenge + ") ";
                 }
@@ -479,13 +479,13 @@ function generateSchoolPage(schoolList, parentDir, headerStr, footerStr)
     }
 
     s += "<BR>";
-    s += footerStr;
+    s += renderFooterTemplate();
     fs.writeFileSync(filename, s);
 }
 
 function renderGroupHeader(group)
 {
-    var s = "<div class='GroupHeader'>" +
+    let s = "<div class='GroupHeader'>" +
         "<img border='0' style='height:4em' src='" + group.iconurl + "'>" +
         group.challenge +
         (group.level ? (" - " + levelNames[group.level]) : "") +
@@ -495,23 +495,23 @@ function renderGroupHeader(group)
     return s;
 }
 
-var lastTime=0;
+let lastTime=0;
 function formatTime(t)
 {
-    var ampm = (t >= 1200 ? "PM" : "AM");
+    let ampm = (t >= 1200 ? "PM" : "AM");
     if (t >= 1300) t -= 1200;
 
-    var mins = t % 100;
+    let mins = t % 100;
     if (mins >= 60) mins -= 40;
-    var minStr = "" + mins;
+    let minStr = "" + mins;
     if (minStr.length === 1) minStr = "0" + mins;
-    var timeStr = Math.floor(t / 100) + ":" + minStr;
+    let timeStr = Math.floor(t / 100) + ":" + minStr;
 
     return timeStr + ampm;
 }
 
-var eventTypeAbbrev = ["?", "TC", "IC", "IN"];
-var levelNames = {
+const eventTypeAbbrev = ["?", "TC", "IC", "IN"];
+const levelNames = {
     "EL":"Elem",
     "HS":"High School",
     "MS":"Middle",
@@ -521,7 +521,7 @@ var levelNames = {
     'X':'High School'
 };
 
-var levelIndexes = {
+const levelIndexes = {
     "RS":0,
     "EL":1,
     "MS":2,
@@ -543,13 +543,13 @@ function renderGroupRow(row, event)
         console.log("ERROR: level is not set", row);
         return;
     }
-    var levelName = levelNames[row.level];
+    let levelName = levelNames[row.level];
     if (!levelName) {
         console.log("Level name lookup failed", row);
         return;
     }
 
-    var s = "  <a href='/teams/" + row.teamid  + ".htm'><div class='SchedRow'>\n" +
+    let s = "  <a href='/teams/" + row.teamid  + ".htm'><div class='SchedRow'>\n" +
         (row.structCheckinTime ? ("    <div class='TimeStructure'>" + emoBalance + " " + row.structCheckinTime.timeStr + "</div>\n") : "") +
         "    <div class='TimePerfCheckin'> " + row.perfCheckingTime.timeStr + "</div>\n" +
         "    <div class='TimePerf'> " + row.tctime.timeStr + "</div>\n" +
@@ -566,19 +566,10 @@ function renderGroupRow(row, event)
     return s;
 }
 
-var rsmapLink="/map.html?loc=ll_hallway_157_161";
-var rsloc="Hallway outside RM 157 on Lower Level";
-
-var icmapLink="/map.html?loc=ll_stairwellrm119";
-var icloc="Stairway next to RM 119 on Lower Level";
-
-//ML_RM225
-var structureCheckinMapLink="/map.html?loc=ml_rm225";
-var structureLoc="RM 225 on Main Level";
 
 function renderTeamDetails(row)
 {
-    var s ='';
+    let s ='';
 
     s +=    "        <div class='TeamHeader'>" + renderTeamId(row.teamid) + "\n" +
         "      " + row.teamname + " </div>\n" ;
@@ -586,17 +577,17 @@ function renderTeamDetails(row)
 
     s += " <div class='SchedRow' style='padding-left:0.5em'>\n";
 
-    var icRow = "";
+    let icRow = "";
 
     if (row.ictime) {
         icRow ="<tr><td><b>" + row.ictime.timeStr + "</b></td><td>Instant Chal CheckIn</td><td>" +
-            "      <a class='Location' href='" + icmapLink + "'>&#x1F4CD;  " + icloc +  "</a></td></tr>\n" ;
+            "      <a class='Location' href='/map.html?loc=" + gStringData.icroomid + "'>&#x1F4CD;  " + gStringData.icroomname +  "</a></td></tr>\n" ;
     }
 
-    var tcRows = "";
+    let tcRows = "";
     if (row.structCheckinTime) {
         tcRows += "<tr><td><b>" + row.structCheckinTime.timeStr + "</b></td><td>Structure CheckIn</td><td>" +
-            "      <a class='Location'  href='" + structureCheckinMapLink + "'>&#x1F4CD;  " + structureLoc +  "</a></td></tr>\n" ;
+            "      <a class='Location'  href='/map.html?loc=" + gStringData.sciroomid + "'>&#x1F4CD;  " + gStringData.sciroomname +  "</a></td></tr>\n" ;
     }
     tcRows +=    "<tr><td><b> " + row.perfCheckingTime.timeStr + "</b></td><td>Performance CheckIn</td><td> " +
         "      <a class='Location'  href='" + row.tctime.mapLink + "'>&#x1F4CD;  " + row.tctime.loc +  "</a></td></tr>\n" +
@@ -612,7 +603,7 @@ function renderTeamDetails(row)
 
     s += "<div class='AfterTimeTable'>";
 
-    var iconurl = "/images/" + row.challengeObj.icon;
+    let iconurl = "/images/" + row.challengeObj.icon;
 
     s += "        School: " + row.school + "<BR>\n"
     s += "        Managers: " + row.managers + "<BR>\n"
@@ -628,7 +619,7 @@ function renderRowOld(row)
 {
     renderRowTime(row.tctime);
 
-    var s = "<li class='card TeamRow'>";
+    let s = "<li class='card TeamRow'>";
     s += "<div class='card-title'>" +  row.teamid + " " + row.teamname + "</div>";
     s += "<div class='card-subtitle'>" + row.school  + "</div>";
     s += "</li>\n";
@@ -665,19 +656,19 @@ function addTimes(dest, team, eventType)
 
 function renderGroup(group, filter)
 {
-    var times=[];
+    let times=[];
 
     // extract relevant event times
-    for (var i=0;i < group.rows.length; i++) {
+    for (let i=0;i < group.rows.length; i++) {
         addTimes(times, group.rows[i], filter.eventType);
     }
 
     times.sort(sortByEventTime);
 
-    var s = renderGroupHeader(group);
+    let s = renderGroupHeader(group);
 
-    for (var i=0; i < times.length;i++) {
-        var event = times[i];
+    for (let i=0; i < times.length;i++) {
+        let event = times[i];
         s += renderGroupRow(event.team, event);
     }
     return s;
@@ -690,7 +681,7 @@ function validateRow(row)
 
 function doEscape(chalName)
 {
-    var s = chalName.replace(/[ ,]/g, "_");
+    let s = chalName.replace(/[ ,]/g, "_");
     s = s.replace(/[?<>!]/g,"");
     return s;
 }
@@ -712,17 +703,17 @@ function Group(challenge, panel, level, iconurl, challengeObj)
 
 function splitIntoGroups(rows)
 {
-    var groups={};
-    for (var i=0;i < rows.length;i++) {
-        var row = rows[i];
-        var key = row.challenge;
+    let groups={};
+    for (let i=0;i < rows.length;i++) {
+        let row = rows[i];
+        let key = row.challenge;
         //if (row.panel) key += '|' + row.panel;
         if (row.level) key += '|' + row.level;
-        var group = groups[key];
+        let group = groups[key];
         if (group) {
 
         } else {
-            var iconurl = "/images/" + row.challengeObj.icon;
+            let iconurl = "/images/" + row.challengeObj.icon;
             group = new Group(row.challenge, row.panel, row.level, iconurl, row.challengeObj);
             groups[key] = group;
         }
@@ -730,8 +721,8 @@ function splitIntoGroups(rows)
     }
 
     // transform from map to array of groups
-    var tmp=[];
-    for (var g in groups) {
+    let tmp=[];
+    for (let g in groups) {
         tmp.push (groups[g]);
     }
     return tmp;
@@ -752,14 +743,14 @@ function SchoolTeam(teamid, name, challenge)
 
 function addToSchoolList(team)
 {
-    var school = schoolMap[team.school];
+    let school = schoolMap[team.school];
     if (!school) {
         school = new School(team.school);
         schoolList.push(school);
         schoolMap[team.school] = school;
     }
 
-    var levelIndex = team.level; //levelIndexes[team.level];
+    let levelIndex = team.level; //levelIndexes[team.level];
     if (!school.levels[levelIndex]) {
         school.levels[levelIndex] = [];
     }
@@ -768,19 +759,19 @@ function addToSchoolList(team)
 
 
 function loadSchedule(filename) {
-    var str = fs.readFileSync(filename).toString();
+    let str = fs.readFileSync(filename).toString();
 
-    var rows = CSVToArray(str, ',');
+    let rows = CSVToArray(str, ',');
     //console.log(rows);
 
     // filter
 
-    var result = [];
-    for (var i = 0; i < rows.length; i++) {
+    let result = [];
+    for (let i = 0; i < rows.length; i++) {
         if (i === 0) continue; // skip header row
         if (rows[i].length < 10) continue; // skip empty rows
 
-        var row = new Team(rows[i]);
+        let row = new Team(rows[i]);
         if (row.teamid == 0) continue;
 
         validateRow(row);
@@ -795,21 +786,16 @@ function loadSchedule(filename) {
 
 function filterAndRender(rows, filter)
 {
-    var filteredRows = [];
+    let filteredRows = [];
 
-    for (var i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
         if (!filterRow(rows[i], filter)) {
             filteredRows.push(rows[i]);
         }
     }
     // organize
 
-    var groups = splitIntoGroups(filteredRows);
-    /*
-    for (var i=0;i<groups.length;i++) {
-        var group = groups[i];
-        group.rows.sort(sortByTCTime);
-    }*/
+    let groups = splitIntoGroups(filteredRows);
 
     render(filter, groups);
 }
@@ -817,7 +803,7 @@ function filterAndRender(rows, filter)
 function ChallengeRow(row)
 {
     //A,Technical Challenge,Maze Craze,orange,di-icon-mazecraze.png
-    var i = 0;
+    let i = 0;
     this.abbrev = row[i++];
     this.type = row[i++];
     this.name = row[i++];
@@ -829,21 +815,21 @@ function ChallengeRow(row)
 
 function loadChallenges(filename)
 {
-    var str = fs.readFileSync(filename).toString();
+    let str = fs.readFileSync(filename).toString();
 
-    var rows = CSVToArray(str, ',');
+    let rows = CSVToArray(str, ',');
     //console.log(rows);
 
     // filter
 
-    var map = {};
+    let map = {};
 
-    var filteredRows=[];
-    for (var i=0;i<rows.length;i++) {
-//        if (i === 0) continue; // skip header row
+    let filteredRows=[];
+    for (let i=0;i<rows.length;i++) {
+        if (i === 0) continue; // skip header row. TODO: use header row
         if (!rows[i][0]) continue; // skip empty rows
 
-        var obj = new ChallengeRow(rows[i]);
+        let obj = new ChallengeRow(rows[i]);
         map[obj.abbrev] = obj;
     }
 
@@ -851,37 +837,149 @@ function loadChallenges(filename)
     return map;
 }
 
+function RoomAssignment(row)
+{
+  //TempWorkingName,RoomID,ActualName,BuildingLevel,MapX,MapY,
+  //IC Check In,L1_EASTPF,East Entrance Hallway,Level 1,0,0
+  let i = 0;
+  this.tempWorkingName = row[i++].trim();
+  this.id = row[i++].trim();
+  this.actualName = row[i++].trim();
+  this.buildingLevel = row[i++].trim();
+  this.mapx = row[i++].trim();
+  this.mapy = row[i++].trim();
+
+  this.label = this.actualName;
+  if (this.buildingLevel.length > 0) this.label = this.actualName + " on " + this.buildingLevel;
+  return this;
+}
 
 function loadRoomAssignments(filename)
 {
-    var str = fs.readFileSync(filename).toString();
+    let str = fs.readFileSync(filename).toString();
 
-    var rows = CSVToArray(str, ',');
-    //console.log(rows);
+    let rows = CSVToArray(str, ',');
 
-    // filter
+    let map = {};
 
-    var map = {};
-
-    var filteredRows=[];
-    for (var i=0;i<rows.length;i++) {
+    let filteredRows = [];
+    for (let i=0;i<rows.length;i++) {
+      // TODO: use header row
         if (i === 0) continue; // skip header row
         if (!rows[i][0]) continue; // skip empty rows
 
-        map[rows[i][0]] = rows[i][1].trim().toLowerCase();
+        let room = new RoomAssignment(rows[i]);
+        map[room.tempWorkingName] = room;
+
+        //map[rows[i][0]] = rows[i][1].trim().toLowerCase();
     }
 
+    let structureCheckinRoom = map['Structure Weigh In'];
+    let icroom = map['IC Check In'];
+    let rsciroom = map['Rising Stars Check In'];
+
+    if (!structureCheckinRoom) {
+      console.log("ERROR: no room assignment present for 'Structure Weigh In'");
+      process.exit(4);
+    }
+
+    if (!icroom) {
+      console.log("ERROR: no room assignment present for 'IC Check In'");
+      process.exit(4);
+    }
+
+    if (!rsciroom) {
+      console.log("ERROR: no room assignment present for 'Rising Stars Check In'");
+      process.exit(4);
+    }
+
+    gStringData.sciroomid = structureCheckinRoom.id;
+    gStringData.sciroomname = structureCheckinRoom.label;
+    gStringData.icroomid = icroom.id;
+    gStringData.icroomname = icroom.label;
+    gStringData.rsciroomid = rsciroom.id;
+    gStringData.rsciroomname = rsciroom.label;
 
     return map;
 }
 
+function copyImages(fromdir, todir, force)
+{
+  let flags = (force ? 0 : fs.constants.COPYFILE_EXCL);
 
-mapChallenges = loadChallenges("../webapp/challenges.csv");
-mapRooms = loadRoomAssignments("../webapp/rooms.csv");
+  if (!fs.existsSync(todir)) fs.mkdirSync(todir);
 
-schedRows = loadSchedule('../di18schedfinal.csv');
 
-var filter = {challenge:null, panel:null, team:null, school: null};
+  let files = fs.readdirSync(fromdir);
+  for (let i=0;i < files.length;i++) {
+    let f = files[i];
+    fs.copyFileSync(path.join(fromdir, f), path.join(todir,f));
+  }
+}
+
+function renderTemplate(compiledTemplate, data)
+{
+  return compiledTemplate(data);
+}
+
+function renderHeaderTemplate(pageTitle)
+{
+  gStringData.title = pageTitle;
+  let s = renderTemplate(gTemplates['header.html'], gStringData);
+  return s;
+}
+
+function renderFooterTemplate()
+{
+  let s = renderTemplate(gTemplates['footer.html'], gStringData);
+  return s;
+}
+
+function loadHtmlTemplates()
+{
+  for (let i = 0; i < TEMPLATEFILES.length; i++) {
+    let filename = TEMPLATEFILES[i];
+    try {
+        let templateString = fs.readFileSync(path.join(TEMPLATEDIR,filename),'utf8').toString();
+        gTemplates[filename] = _.template(templateString);
+    } catch (ex) {
+        console.log("ERROR: unable to load template: " + path.join(TEMPLATEDIR,filename));
+        process.exit(3);
+    }
+  }
+}
+
+// =======================================================
+// Execution starts here
+// =======================================================
+
+// create output dir
+
+if (!fs.existsSync(OUTDIR)) fs.mkdirSync(OUTDIR);
+
+// copy images to output/images
+
+copyImages(path.join(TOPDIR,'images'), path.join(OUTDIR,"images"), true);
+
+// load general strings like region, event date, title prefixes
+
+gStringData = JSON.parse(fs.readFileSync(path.join(DATADIR,"strings.json"), 'utf8'));
+
+// load HTML templates
+
+loadHtmlTemplates();
+
+// load CSV files
+
+mapChallenges = loadChallenges(path.join(DATADIR,'challenges.csv'));
+
+mapRooms = loadRoomAssignments(path.join(DATADIR,'room_assignments.csv'));
+
+schedRows = loadSchedule(path.join(DATADIR,'schedfinal.csv'));
+
+// render static HTML files
+
+let filter = {challenge:null, panel:null, team:null, school: null};
 
 filterAndRender(schedRows, filter);
 

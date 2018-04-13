@@ -1,9 +1,10 @@
-R,Rising Stars,Friends Everywhere,red,di-icon-friendseverywhere.png,0
-RS,Rising Stars,Friends Everywhere,red,di-icon-friendseverywhere.png,0
-A,Technical Challenge,Maze Craze,orange,di-icon-mazecraze.png,1
-B,Scientific,Unlikely Attraction,yellow,di-icon-unlikelyattraction.png,2
-C,Fine Arts,Change of Tune,blue,di-icon-changeoftune.png,3
-D,Improvisational,Treasure!,pink,di-icon-treasure.png,4
-E,Engineering/Structural,Drop Zone,green,di-icon-dropzone.png,5
-P,Outreach/Service,Inside Impact,teal,di-icon-insideimpact.png,6
-X,Extreme,Extreme,black,di-icon-extreme.png,7
+LevelChar,Level,Name,Color,Icon,Order
+R,Rising Stars,Friends Everywhere,red,icon-R-risingstars.png,0
+RS,Rising Stars,Friends Everywhere,red,icon-R-risingstars.png,0
+A,Technical Challenge,Maze Craze,orange,icon-A-technical.png,1
+B,Scientific,Unlikely Attraction,yellow,icon-B-scientific.png,2
+C,Fine Arts,Change of Tune,blue,icon-C-finearts.png,3
+D,Improvisational,Treasure!,pink,icon-D-improv.png,4
+E,Engineering/Structural,Drop Zone,green,icon-E-engineering.png,5
+P,Outreach/Service,Inside Impact,teal,icon-P-outreach.png,6
+X,Extreme,Extreme,black,icon-X-extreme.png,7
