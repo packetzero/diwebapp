@@ -389,13 +389,12 @@ function renderMap()
     let filename = path.join(OUTDIR, "map.html");
 
     // build a JSON array of room assignments
-    let s = '';
+    let s = "'TEST':{x:0,y:0,level:'',label:'TEST'}";
     let i = -1;
     for (key in gMapRooms) {
       i++;
       let room = gMapRooms[key];
-      if (i > 0) s += ",";
-      s += "'" + room.id + "' : { x: " + room.mapx + ",y:" + room.mapy + ",level:'" + room.buildingLevel + "',label:'" + room.label + "' }\n";
+      s += ",'" + room.id + "' : { x: " + room.mapx + ",y:" + room.mapy + ",level:'" + room.buildingLevel + "',label:'" + room.label + "' }\n";
     }
 
     gStringData['_rooms_'] = s;

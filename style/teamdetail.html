@@ -15,7 +15,7 @@
 <% } %>
 
     <tr><td><b> {{ row.perfCheckingTime.timeStr }} </b></td><td>Performance CheckIn</td><td>
-        <a class='Location'  href='/map.html?loc= {{ row.room.id }}'>&#x1F4CD;  {{ row.room.label}}</a></td></tr>
+        <a class='Location'  href='/map.html?loc={{ row.room.id }}'>&#x1F4CD;  {{ row.room.label}}</a></td></tr>
     <tr><td><b> {{ row.tctime.timeStr }} </b></td><td>Performance</td><td>&nbsp;</td></tr>
 
 <% if (row.ictime && (row.ictime.timeVal >= row.tctime.timeVal)) { %>

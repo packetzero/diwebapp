@@ -1,16 +1,16 @@
 TempWorkingName,RoomID,ActualName,BuildingLevel,MapX,MapY,
-IC Check In,L1_EASTPF,East Entrance Hallway,Level 1,0,0
-Rising Stars Check In,L1_NORTH,North Hallway,Level 1,0,0
-Structure Weigh In,L2_NORTH,North Hallway,Level 2,0,0
-EXTREME,L3_TIMPAN,TimPanogos Terrace,Level 3,0.83,0.20
-TC Friends RS-T,L1_EXHCL,Exhibit Hall C Left,Level 1,0.07,0.22
-TC Friends RS-E,L1_EXHCC,Exhibit Hall C Center,Level 1,0,0
-TC Friends RS-X,L1_EXHCR,Exhibit Hall C Right,Level 1,0,0
-TC Inside EL ML,L3_SOLCRK,Soldier Creek Room,Level 3,0,0
-TC Drop EL ML,L3_BATCRK,Battle Creek Room,Level 3,0,0
-TC Drop EL ML 2,L3_SILCRK,Silver Creek Room,Level 3,0,0
-TC Treasure EL ML SL UL,L3_HOBCRK,Hobble Creek Room,Level 3,0,0
-TC Rm236 Change EL,L3_BR,Board Room,Level 3,0,0
-TC Rm240 Change ML SL,L3_CASB,Cascade B,Level 3,0,0
-TC Unlikely EL ML,L3_SOLCRK,Soldier Creek Room,Level 3,0,0
-TC NGC PE GYM Maze EL ML SL,L2_BALLB,Ballroom B,Level 2,0,0
+IC Check In,L1_EASTPF,East Entrance Hallway,Level 1,0.3,0.5
+Rising Stars Check In,L1_NORTH,North Hallway,Level 1,0.25,0.13
+Structure Weigh In,L2_NORTH,North Hallway,Level 2,0.56,0.15
+EXTREME,L3_TIMPAN,TimPanogos Terrace,Level 3,0.88,0.28
+TC Friends RS-T,L1_EXHC,Exhibit Hall C,Level 1,0.17,0.28
+TC Friends RS-E,L1_EXHB,Exhibit Hall B,Level 1,0.17,0.42
+TC Friends RS-X,L1_EXHA,Exhibit Hall A,Level 1,0.17,0.57
+TC Inside EL ML,L3_SOLCRK,Soldier Creek Room,Level 3,0.73,0.41
+TC Drop EL ML,L3_BATCRK,Battle Creek Room,Level 3,0.77,0.39
+TC Drop EL ML 2,L3_SILCRK,Silver Creek Room,Level 3,0.80,0.40
+TC Treasure EL ML SL UL,L3_HOBCRK,Hobble Creek Room,Level 3,0.83,0.39
+TC Rm236 Change EL,L3_BR,Board Room,Level 3,0.94,0.39
+TC Rm240 Change ML SL,L3_CASB,Cascade B,Level 3,0.89,0.62
+TC Unlikely EL ML,L2_BALLA,Ballroom A,Level 2,0.48,0.61
+TC NGC PE GYM Maze EL ML SL,L2_BALLB,Ballroom B,Level 2,0.48,0.48

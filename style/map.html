@@ -71,6 +71,13 @@
       loc = urlParams["loc"];
 
       drawSpotlight();
+
+      if (loc == 'TEST') {
+        document.getElementById('mapimg').onmousemove=function(evt) {
+          var img = document.getElementById('mapimg');
+          document.getElementById('locname').innerHTML = (evt.x / img.width).toFixed(2) + "," + ((evt.y - img.offsetTop) / img.height).toFixed(2);
+        }
+      }
     }
   }
   function drawSpotlight() {
@@ -81,11 +88,11 @@
 
       var img = document.getElementById('mapimg');
 
-      var left = Math.round(img.width * pos.x);
-      var top = Math.round(0 - img.height + img.height * pos.y);
+      spotlight.style.display = 'block';
+      var left = Math.round(img.width * pos.x) - Math.round(spotlight.clientWidth * 0.6);
+      var top = 0 - img.height + Math.round(img.height * pos.y) - Math.round(spotlight.clientHeight * 0.6);
       spotlight.style.left = left + 'px';
       spotlight.style.top = top + 'px';
-      spotlight.style.display = 'block';
     }
   }
   </script>
