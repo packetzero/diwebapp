@@ -9,23 +9,38 @@ const OUTDIR=path.join(TOPDIR,"output");
 const DATADIR=path.join(TOPDIR,"data");
 const TEMPLATEDIR=path.join(TOPDIR,"style");
 
-const TEMPLATEFILES = [ "header.html", "footer.html", "map.html" ];
+const TEMPLATEFILES = [ "header.html", "footer.html", "map.html", "teamdetail.html", "grouprow.html", "index.html", "groupheaderrow.html", "schools.html" ];
+
+const eventTypeAbbrev = ["?", "TC", "IC", "IN"];
+const levelNames = {
+    "EL":"Elem",
+    "HS":"High School",
+    "MS":"Middle",
+    "RS":"Rising Stars",
+    "UN": "Univ",
+    'SL':'Secondary',
+    'X':'High School'
+};
+
+const levelIndexes = {
+    "RS":0,
+    "EL":1,
+    "MS":2,
+    'SL':3,
+    "HS":4,
+    "UN": 5,
+    'X':4
+};
 
 let gTemplates = {};
 let gStringData = {};
 let mapChallenges={};
-let mapRooms={};
+let gMapRooms={};
 
 let schoolList = [];
 let schoolMap = {};
 
-
-const emoBalance = "&#x2696;";
-const emoHourglass = "&#x23F3;";
-const emoAction = "&#x1F3AC;";
-const emoLightbulb = "&#x1F4A1;";
-const emoPage = "&#x1F4C4;";
-const emoMap = "&#x1F5FA;";
+const EMOJI={ balance: "&#x2696;", page: "&#x1F4C4;", map: "&#x1F5FA;"};
 
 // ref: http://stackoverflow.com/a/1293163/2343
 // This will parse a delimited string into an array of
@@ -208,7 +223,7 @@ function Team(cols)
     // lookups
 
     this.challengeObj = mapChallenges[this.challengeid];
-    this.room = mapRooms[this.roomAlias];
+    this.room = gMapRooms[this.roomAlias];
 
     //if (this.level == 'X') this.level = 'HS';
 
@@ -390,49 +405,10 @@ function generateChallengeIndex(challengeGroups, parentDir)
     let pageTitle = gStringData['TitleMain'] + " " + gStringData['EventYear'];
     let s = renderHeaderTemplate(pageTitle);
 
-    s += "<div style='text-align: center;font-weight:bold'>Welcome to the " + gStringData.EventYear + " " + gStringData.TournamentTitle + "</div>";
+    gStringData.challengeGroups = challengeGroups;
 
-    s += "<div class='GroupHeader'>Schedule - By Challenge and Level</div>";
+    s += renderTemplate(gTemplates['index.html'], gStringData);
 
-    for (let i=0;i < challengeGroups.length; i++) {
-        let chal = challengeGroups[i];
-        let iconurl = "/images/" + chal.icon;
-        s += "<div style='clear:both'>";
-        s += "<img border='0' style='height:4em;float:left' src='" + iconurl + "'>" ;
-
-        s += "<div style='float:left'>";
-        s += "<div class='Title'>" + chal.name ;
-        if (chal.type != chal.name)
-            s += "&nbsp; <div class='SubTitle'>" + chal.type +"</div>";
-        s += "</div>";
-
-
-        for (let j=0;j < 6;j++) {
-            let level = chal.levels[j];
-            if (level) {
-                s += "<a class='ChalBtn' href='" + level.path + "'>" + level.name + " " +
-                    "<div class='LevelCount'> (" + level.num + ")</div></a>";
-            }
-        }
-
-        s += "</div>";
-
-        s += "</div><BR>";
-
-    }
-
-    s += "<div class='GroupHeader'>Map</div>";
-
-    s += "&nbsp;<a href='map.html' style='text-decoration:underline'>Click here to view the site map " + emoMap + "</a><BR>" +
-        "&nbsp; (The team detail pages link to exact locations for check ins)<BR>" ;
-
-    s += "<div class='GroupHeader'>School List</div>";
-
-    s += "&nbsp;<a href='schools.htm' style='text-decoration:underline'>Click to view list of teams by school</a>";
-
-
-
-    s += "<BR>";
     s += renderFooterTemplate();
     fs.writeFileSync(filename, s);
 
@@ -449,64 +425,17 @@ function generateSchoolPage(schoolList, parentDir)
     let pageTitle = gStringData['TitlePrefixMisc'] + 'Schools';
     let s = renderHeaderTemplate(pageTitle);
 
-    s += "<div class='GroupHeader'>List of Teams by School</div>";
-
-    let schools = schoolList.sort(sortByName);
-
-    for (let i=0;i < schools.length; i++) {
-        let school = schools[i];
-        let schoolName = school.name;
-        if (school.name.trim() == '') schoolName = " (school name unknown) ";
-
-        s += "<div style='clear:both'>";
-
-        s += "<div class='Title'>" + schoolName ;
-        s += "</div>";
-        s += "<table border=0>";
-
-
-        for (let level in school.levels) {
-            let teams = school.levels[level];
-            if (!teams) {
-                continue;
-            }
-            teams = teams.sort(sortByName);
-
-            for (let k=0; k < teams.length;k++)
-            {
-                let team = teams[k];
-                let path = "/teams/" + team.teamid + ".htm";
-                let name = team.name;
-                if (name == '') {
-                    name = team.teamid + " (" + team.challenge + ") ";
-                }
-
-                s += "<tr><td>" + levelNames[level] + "</td><td>"
-                s += "<a class='ChalBtn' href='" + path + "'>" +  name + "</a></td></tr>";
-            }
-
-        }
-
-        s += "</table>\n";
-        s += "</div><BR>";
-
-    }
-
-    s += "<BR>";
+    gStringData.sortByName = sortByName;
+    gStringData.schools = schoolList.sort(sortByName);
+    s += renderTemplate(gTemplates['schools.html'], gStringData);
     s += renderFooterTemplate();
     fs.writeFileSync(filename, s);
 }
 
 function renderGroupHeader(group)
 {
-    let s = "<div class='GroupHeader'>" +
-        "<img border='0' style='height:4em' src='" + group.iconurl + "'>" +
-        group.challenge +
-        (group.level ? (" - " + levelNames[group.level]) : "") +
-        (group.panel ? (" &nbsp;" + group.panel) : "") +
-        "</div>";
-
-    return s;
+  gStringData.group = group;
+  return renderTemplate(gTemplates['groupheaderrow.html'], gStringData);
 }
 
 let lastTime=0;
@@ -524,27 +453,6 @@ function formatTime(t)
     return timeStr + ampm;
 }
 
-const eventTypeAbbrev = ["?", "TC", "IC", "IN"];
-const levelNames = {
-    "EL":"Elem",
-    "HS":"High School",
-    "MS":"Middle",
-    "RS":"Rising Stars",
-    "UN": "Univ",
-    'SL':'Secondary',
-    'X':'High School'
-};
-
-const levelIndexes = {
-    "RS":0,
-    "EL":1,
-    "MS":2,
-    'SL':3,
-    "HS":4,
-    "UN": 5,
-    'X':4
-};
-
 
 function renderTeamId(teamid)
 {
@@ -555,90 +463,19 @@ function renderGroupRow(row, event)
 {
     if (!row.level) {
         console.log("ERROR: level is not set", row);
-        return;
+        process.exit(4);
     }
-    let levelName = levelNames[row.level];
-    if (!levelName) {
-        console.log("Level name lookup failed", row);
-        return;
-    }
-
-    let s = "  <a href='/teams/" + row.teamid  + ".htm'><div class='SchedRow'>\n" +
-        (row.structCheckinTime ? ("    <div class='TimeStructure'>" + emoBalance + " " + row.structCheckinTime.timeStr + "</div>\n") : "") +
-        "    <div class='TimePerfCheckin'> " + row.perfCheckingTime.timeStr + "</div>\n" +
-        "    <div class='TimePerf'> " + row.tctime.timeStr + "</div>\n" +
-        (row.ictime ? ("   <div class='TimeInstantChal'> IC:<b>" + row.ictime.timeStr + "</b></div> \n") : "") +
-        "    <div class='Details'>\n" +
-        "      <div class='Team'>" + row.teamname + " </div>\n" +
-        "        <div class='TeamId'>" + renderTeamId(row.teamid) + "</div>\n" +
-        "        <div class='School'>" + row.school + "</div>\n" +
-        emoPage +
-        //        "      <div class='ClickDetails'>(click for details...)</div>\n" +
-        //        "      <a class='Location' href='" + event.mapLink + "'>&#x1F4CD;  " + event.loc +  "</a>\n" +
-        "    </div>\n" +
-        "  </div></a>\n";
-    return s;
+    gStringData['row'] = row;
+    return renderTemplate(gTemplates['grouprow.html'], gStringData);
 }
 
 
 function renderTeamDetails(row)
 {
-    let s ='';
-
-    s +=    "        <div class='TeamHeader'>" + renderTeamId(row.teamid) + "\n" +
-        "      " + row.teamname + " </div>\n" ;
-
-
-    s += " <div class='SchedRow' style='padding-left:0.5em'>\n";
-
-    let icRow = "";
-
-    if (row.ictime) {
-        icRow ="<tr><td><b>" + row.ictime.timeStr + "</b></td><td>Instant Chal CheckIn</td><td>" +
-            "      <a class='Location' href='/map.html?loc=" + gStringData.icroomid + "'>&#x1F4CD;  " + gStringData.icroomname +  "</a></td></tr>\n" ;
-    }
-
-    let tcRows = "";
-    if (row.structCheckinTime) {
-        tcRows += "<tr><td><b>" + row.structCheckinTime.timeStr + "</b></td><td>Structure CheckIn</td><td>" +
-            "      <a class='Location'  href='/map.html?loc=" + gStringData.sciroomid + "'>&#x1F4CD;  " + gStringData.sciroomname +  "</a></td></tr>\n" ;
-    }
-    tcRows +=    "<tr><td><b> " + row.perfCheckingTime.timeStr + "</b></td><td>Performance CheckIn</td><td> " +
-        "      <a class='Location'  href='" + row.tctime.mapLink + "'>&#x1F4CD;  " + row.tctime.loc +  "</a></td></tr>\n" +
-        "<tr><td><b> " + row.tctime.timeStr + "</b></td><td>Performance</td><td>&nbsp;</td></tr>" ;
-
-    s += "<table border='0'>";
-    if (row.ictime && (row.ictime.timeVal < row.tctime.timeVal))
-        s += icRow + tcRows;
-    else
-        s += tcRows + icRow;
-    s += "</table>";
-    s += "</div>"; // SchedRow
-
-    s += "<div class='AfterTimeTable'>";
-
-    let iconurl = "/images/" + row.challengeObj.icon;
-
-    s += "        School: " + row.school + "<BR>\n"
-    s += "        Managers: " + row.managers + "<BR>\n"
-    s += "Challenge: " + row.challenge + " (" + row.challengeObj.type + " ) <BR>";
-    s +=    "<img border='0'  src='" + iconurl + "'>" ;
-    s += "</div>";
-
-
-    return s;
+  gStringData['row'] = row;
+  return renderTemplate(gTemplates['teamdetail.html'], gStringData);
 }
 
-function renderRowOld(row)
-{
-    renderRowTime(row.tctime);
-
-    let s = "<li class='card TeamRow'>";
-    s += "<div class='card-title'>" +  row.teamid + " " + row.teamname + "</div>";
-    s += "<div class='card-subtitle'>" + row.school  + "</div>";
-    s += "</li>\n";
-    return s;
-}
 
 function addTimes(dest, team, eventType)
 {
@@ -913,6 +750,9 @@ function loadRoomAssignments(filename)
     gStringData.icroomname = icroom.label;
     gStringData.rsciroomid = rsciroom.id;
     gStringData.rsciroomname = rsciroom.label;
+    gStringData.emoji = EMOJI;
+    gStringData.levelNames = levelNames;
+
 
     return map;
 }
@@ -957,7 +797,7 @@ function loadHtmlTemplates()
         let templateString = fs.readFileSync(path.join(TEMPLATEDIR,filename),'utf8').toString();
         gTemplates[filename] = _.template(templateString);
     } catch (ex) {
-        console.log("ERROR: unable to load template: " + path.join(TEMPLATEDIR,filename));
+        console.log("ERROR: unable to load template: " + path.join(TEMPLATEDIR,filename), ex);
         process.exit(3);
     }
   }
@@ -987,7 +827,7 @@ loadHtmlTemplates();
 
 mapChallenges = loadChallenges(path.join(DATADIR,'challenges.csv'));
 
-mapRooms = loadRoomAssignments(path.join(DATADIR,'room_assignments.csv'));
+gMapRooms = loadRoomAssignments(path.join(DATADIR,'room_assignments.csv'));
 
 schedRows = loadSchedule(path.join(DATADIR,'schedfinal.csv'));
 

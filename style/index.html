@@ -1,0 +1,42 @@
+<div style='text-align: center;font-weight:bold'>Welcome to the {{EventYear}} DI {{GeoArea}} Tournament</div>
+
+<div class='GroupHeader'>Schedule - By Challenge and Level</div>
+
+<%
+for (let i=0;i < challengeGroups.length; i++) {
+    let chal = challengeGroups[i];
+%>
+    <div style='clear:both'>
+      <img border='0' style='height:4em;float:left' src='/images/{{chal.icon}}'>
+
+      <div style='float:left'>
+        <div class='Title'>{{chal.name}}
+          <% if (chal.type != chal.name) { %>
+            &nbsp; <div class='SubTitle'>{{chal.type}}</div>
+          <% } %>
+        </div>
+
+        <%
+        for (let j=0;j < 6;j++) {
+          let level = chal.levels[j];
+          if (level) {
+        %>
+            <a class='ChalBtn' href='{{level.path}}'>{{level.name}}<div class='LevelCount'> ({{level.num}})</div></a>
+        <% }
+        } %>
+
+      </div>
+    </div><BR>
+
+<% } %>
+
+<div class='GroupHeader'>Map</div>
+
+  &nbsp;<a href='map.html' style='text-decoration:underline'>Click here to view the site map {{emoji.map}} </a><BR>
+    &nbsp; (The team detail pages link to exact locations for check ins)<BR>
+
+<div class='GroupHeader'>School List</div>
+
+  &nbsp;<a href='schools.htm' style='text-decoration:underline'>Click to view list of teams by school</a>
+
+<BR>

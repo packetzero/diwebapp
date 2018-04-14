@@ -1,0 +1,44 @@
+<div class='GroupHeader'>List of Teams by School</div>
+
+<% for (let i=0;i < schools.length; i++) {
+    let school = schools[i];
+    let schoolName = school.name;
+    if (school.name.trim() == '') schoolName = " (school name unknown) ";
+%>
+    <div style='clear:both'>
+
+      <div class='Title'>{{schoolName}}</div>
+
+      <table border=0>
+
+
+    <% for (let level in school.levels) {
+        let teams = school.levels[level];
+        if (!teams) {
+            continue;
+        }
+        teams = teams.sort(sortByName);
+
+        for (let k=0; k < teams.length;k++)
+        {
+            let team = teams[k];
+            let path = "/teams/" + team.teamid + ".htm";
+            let name = team.name;
+            if (name == '') {
+                name = team.teamid + " (" + team.challenge + ") ";
+            }
+    %>
+
+            <tr><td>{{levelNames[level]}}</td><td>
+            <a class='ChalBtn' href='{{path}}'>{{name}}</a></td></tr>
+    <%
+        }
+
+    } %>
+
+    </table>
+  </div><BR>
+
+<% } %>
+
+<BR>

@@ -1,3 +1,5 @@
 /output
 /generator/node_modules
 /generator/.idea
+node_modules
+package-lock.json

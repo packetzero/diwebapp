@@ -1,0 +1,10 @@
+<div class='GroupHeader'>
+    <img border='0' style='height:4em' src='{{group.iconurl}}'>
+    {{group.challenge}}
+    <% if (group.level) { %>
+       - {{levelNames[group.level]}}
+    <% } %>
+    <% if (group.panel) { %>
+       &nbsp;{{group.panel}}
+    <% } %>
+</div>

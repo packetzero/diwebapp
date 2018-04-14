@@ -1,0 +1,18 @@
+<a href='/teams/{{row.teamid}}.htm'>
+  <div class='SchedRow'>
+    <% if (row.structCheckinTime) { %>
+         <div class='TimeStructure'>{{emoji.balance}} {{row.structCheckinTime.timeStr}}</div>
+    <% } %>
+    <div class='TimePerfCheckin'>{{row.perfCheckingTime.timeStr}}</div>
+    <div class='TimePerf'> {{row.tctime.timeStr}}</div>
+    <% if (row.ictime) { %>
+      <div class='TimeInstantChal'> IC:<b>{{row.ictime.timeStr}}</b></div>
+    <% } %>
+    <div class='Details'>
+      <div class='Team'>{{row.teamname}}</div>
+      <div class='TeamId'>{{row.teamid}}</div>
+      <div class='School'>{{row.school}}</div>
+      {{emoji.page}}
+    </div>
+  </div>
+</a>
