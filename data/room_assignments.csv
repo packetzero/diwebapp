@@ -2,8 +2,8 @@ TempWorkingName,RoomID,ActualName,BuildingLevel,MapX,MapY,
 IC Check In,L1_EASTPF,East Entrance Hallway,Level 1,0,0
 Rising Stars Check In,L1_NORTH,North Hallway,Level 1,0,0
 Structure Weigh In,L2_NORTH,North Hallway,Level 2,0,0
-EXTREME,L3_TIMPAN,TimPanogos Terrace,Level 3,0,0
-TC Friends RS-T,L1_EXHCL,Exhibit Hall C Left,Level 1,0,0
+EXTREME,L3_TIMPAN,TimPanogos Terrace,Level 3,0.83,0.20
+TC Friends RS-T,L1_EXHCL,Exhibit Hall C Left,Level 1,0.07,0.22
 TC Friends RS-E,L1_EXHCC,Exhibit Hall C Center,Level 1,0,0
 TC Friends RS-X,L1_EXHCR,Exhibit Hall C Right,Level 1,0,0
 TC Inside EL ML,L3_SOLCRK,Soldier Creek Room,Level 3,0,0

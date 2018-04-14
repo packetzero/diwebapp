@@ -2,7 +2,6 @@
 <head>
   <title>Site Map : {{EventYear}} DI {{GeoArea}}</title>
   <style type="text/css">
-  div.container {width:100vh;}
   #spotlight {
     display:none;
     left:75vw;
@@ -28,6 +27,7 @@
     div.container {width:auto}
   }
   @media only screen and (orientation : landscape) {
+    div.container {width:140vh;}
   }
   </style>
   <script language="javascript">
@@ -38,6 +38,9 @@
   //
   var ratio = 1926.0 / 1868.0; // based on combined map pixel ratio width/height
   function Scale(left, top) {
+    var img = document.getElementById('mapimg');
+    var w = img.width;
+    var h
     var isLandscape = (window.innerWidth > window.innerHeight);
     var spotlight = document.getElementById('spotlight');
     var units = 'vw';
@@ -63,29 +66,38 @@
   function locname(locid) {
     return locid;
   }
+  function OnLoad() {
+    if (urlParams["loc"]) {
+      loc = urlParams["loc"];
+
+      drawSpotlight();
+    }
+  }
   function drawSpotlight() {
     var pos = locs[loc];
     if (pos) {
       document.getElementById('spotlight-specifics').style.display='block';
-      document.getElementById('locname').innerHTML=locname(loc);
+      document.getElementById('locname').innerHTML=pos.label;
 
-      scaledPos = Scale(pos[0],pos[1]);
-      spotlight.style.left = scaledPos[0];
-      spotlight.style.top = scaledPos[1];
+      var img = document.getElementById('mapimg');
+
+      var left = Math.round(img.width * pos.x);
+      var top = Math.round(0 - img.height + img.height * pos.y);
+      spotlight.style.left = left + 'px';
+      spotlight.style.top = top + 'px';
       spotlight.style.display = 'block';
-
     }
   }
   </script>
 </head>
-<body>
-  <div id='spotlight-specifics' style='display:none'>
+<body onload="OnLoad()">
+    <div id='spotlight-specifics' style='display:none'>
     Spotlight on : <span id='locname'>&nbsp;</span>
     <button onclick='javascript:clearSpotlight();'>Clear</button>
   </div>
   <div class='container'>
     <div id='mapdiv'>
-      <img src="images/{{MapImageName}}" border=0 width='100%'>
+      <img id='mapimg' src="images/{{MapImageName}}" border=0 width='100%'>
     </div>
     <div id='spotlight' width='100%'></div>
   </div>
@@ -102,12 +114,6 @@ var urlParams;
     urlParams = {};
     while (match = search.exec(query))
        urlParams[decode(match[1])] = decode(match[2]);
-
-    if (urlParams["loc"]) {
-      loc = urlParams["loc"];
-
-      drawSpotlight();
-    }
 
     window.onresize = function(){
       //location.reload();
