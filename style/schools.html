@@ -2,35 +2,24 @@
 
 <% for (let i=0;i < schools.length; i++) {
     let school = schools[i];
-    let schoolName = school.name;
-    if (school.name.trim() == '') schoolName = " (school name unknown) ";
+    let schoolName = ((school.name.trim() == '') ? '(school name unknown)' : school.name);
 %>
     <div style='clear:both'>
-
       <div class='Title'>{{schoolName}}</div>
-
       <table border=0>
-
 
     <% for (let level in school.levels) {
         let teams = school.levels[level];
-        if (!teams) {
-            continue;
-        }
+        if (!teams) { continue; }
         teams = teams.sort(sortByName);
 
         for (let k=0; k < teams.length;k++)
         {
             let team = teams[k];
-            let path = "/teams/" + team.teamid + ".htm";
-            let name = team.name;
-            if (name == '') {
-                name = team.teamid + " (" + team.challenge + ") ";
-            }
+            let name = (team.name == '' ? (team.teamid + " (" + team.challenge + ") ") : team.name);
     %>
-
             <tr><td>{{levelNames[level]}}</td><td>
-            <a class='ChalBtn' href='{{path}}'>{{name}}</a></td></tr>
+            <a class='ChalBtn' href='./teams/{{team.teamid}}.htm'>{{name}}</a></td></tr>
     <%
         }
 

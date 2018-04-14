@@ -6,21 +6,21 @@
 
 <% if (row.ictime && (row.ictime.timeVal < row.tctime.timeVal)) { %>
     <tr><td><b> {{ row.ictime.timeStr }} </b></td><td>Instant Chal CheckIn</td><td>
-        <a class='Location' href='/map.html?loc={{ icroomid }}'>&#x1F4CD;  {{ icroomname }} </a></td></tr>
+        <a class='Location' href='../map.html?loc={{ icroomid }}'>&#x1F4CD;  {{ icroomname }} </a></td></tr>
 <% } %>
 
 <% if (row.structCheckinTime) { %>
     <tr><td><b> {{ row.structCheckinTime.timeStr }} </b></td><td>Structure CheckIn</td><td>
-        <a class='Location'  href='/map.html?loc={{sciroomid}}'>&#x1F4CD;  {{ sciroomname }} </a></td></tr>
+        <a class='Location'  href='../map.html?loc={{sciroomid}}'>&#x1F4CD;  {{ sciroomname }} </a></td></tr>
 <% } %>
 
     <tr><td><b> {{ row.perfCheckingTime.timeStr }} </b></td><td>Performance CheckIn</td><td>
-        <a class='Location'  href='/map.html?loc={{ row.room.id }}'>&#x1F4CD;  {{ row.room.label}}</a></td></tr>
+        <a class='Location'  href='../map.html?loc={{ row.room.id }}'>&#x1F4CD;  {{ row.room.label}}</a></td></tr>
     <tr><td><b> {{ row.tctime.timeStr }} </b></td><td>Performance</td><td>&nbsp;</td></tr>
 
 <% if (row.ictime && (row.ictime.timeVal >= row.tctime.timeVal)) { %>
     <tr><td><b> {{ row.ictime.timeStr }} </b></td><td>Instant Chal CheckIn</td><td>
-        <a class='Location' href='/map.html?loc={{ icroomid }}'>&#x1F4CD;  {{ icroomname }} </a></td></tr>
+        <a class='Location' href='../map.html?loc={{ icroomid }}'>&#x1F4CD;  {{ icroomname }} </a></td></tr>
 <% } %>
 
   </table>
@@ -30,5 +30,5 @@
         School: {{row.school}} <BR>
         Managers: {{row.managers}} <BR>
 Challenge: {{row.challenge}} ({{row.challengeObj.type}} ) <BR>
-<img border='0'  src='/images/{{row.challengeObj.icon}}'>
+<img border='0'  src='../images/{{row.challengeObj.icon}}'>
 </div>

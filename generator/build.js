@@ -544,14 +544,14 @@ function doEscape(chalName)
     return s;
 }
 
-function Group(challenge, panel, level, iconurl, challengeObj)
+function Group(challenge, panel, level, icon, challengeObj)
 {
     this.rows = []
     this.challenge = challenge;
     this.challengeObj = challengeObj;
     this.panel = panel;
     this.level = level;
-    this.iconurl = iconurl;
+    this.icon = icon;
     this.name = challenge + ' ' + level;
     this.path = "/tc/" + doEscape(challenge.toLowerCase()) + '_' + level.toLowerCase();
     if (panel) this.path += '_' + panel;
@@ -571,8 +571,7 @@ function splitIntoGroups(rows)
         if (group) {
 
         } else {
-            let iconurl = "/images/" + row.challengeObj.icon;
-            group = new Group(row.challenge, row.panel, row.level, iconurl, row.challengeObj);
+            group = new Group(row.challenge, row.panel, row.level, row.challengeObj.icon, row.challengeObj);
             groups[key] = group;
         }
         group.rows.push(row);

@@ -7,7 +7,7 @@ for (let i=0;i < challengeGroups.length; i++) {
     let chal = challengeGroups[i];
 %>
     <div style='clear:both'>
-      <img border='0' style='height:4em;float:left' src='/images/{{chal.icon}}'>
+      <img border='0' style='height:4em;float:left' src='images/{{chal.icon}}'>
 
       <div style='float:left'>
         <div class='Title'>{{chal.name}}
@@ -21,7 +21,7 @@ for (let i=0;i < challengeGroups.length; i++) {
           let level = chal.levels[j];
           if (level) {
         %>
-            <a class='ChalBtn' href='{{level.path}}'>{{level.name}}<div class='LevelCount'> ({{level.num}})</div></a>
+            <a class='ChalBtn' href='.{{level.path}}'>{{level.name}}<div class='LevelCount'> ({{level.num}})</div></a>
         <% }
         } %>
 
