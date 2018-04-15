@@ -23,6 +23,7 @@ This project was originally created for the 2018 Destination Imagination Capital
 This project has several techie dependencies (Node.js, javascript modules), and using Docker will take care of all of those details for us.
 
 [Docker for MacOS](https://store.docker.com/editions/community/docker-ce-desktop-mac)
+
 [Docker for Windows](https://store.docker.com/editions/community/docker-ce-desktop-windows)
 
 ## Running using Docker
