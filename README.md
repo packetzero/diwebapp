@@ -13,6 +13,8 @@ This project was originally created for the 2018 Destination Imagination Capital
 - **Low-Cost to Host** : Doesn't require any special web hosting (no database or server runtime).
 
 ## Data Files
+All of the CSV files are sample data, and should be customized for your event.  The map image example used here was freely available on the web, and should be replaced by your own.
+
 - **challenges.csv** : Maps challenge names and icon files. Should be able to use as-is after yearly update.
 - **strings.json** : Update Date and Region Name.
 - **schedfinal.csv** : This is the main data file.  It contains a row for each team, their scheduled times for challenges.  The room assignments are placeholder aliases.
@@ -45,4 +47,8 @@ Clicking the 'Generate' button will produce the files in the **output** subdirec
 
 Transfer the files in the output directory to your hosting server.  This is typically done using SFTP (Secure FTP), FTP, or using a file-manager utility in your admin control panel.
 
-For about $30, you can get a domain (e.g. 'txdi18.com') and a month of hosting at [Network Solutions](https://www.networksolutions.com).
+You could also use [GitHub Pages](https://pages.github.com) to host it for free.  Two things to consider:
+ - **git** can be confusing if you are not a developer.
+ - The URL for your site will be **something.github.io**.
+
+For about $30, you can get a domain (e.g. 'txdi18.com') and a month of hosting at [Network Solutions](https://www.networksolutions.com).  For a longer period, there are cheaper alternatives.
