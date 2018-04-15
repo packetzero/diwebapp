@@ -11,6 +11,7 @@ This project was originally created for the 2018 Destination Imagination Capital
 - **Data-Driven** : No coding required, just edit CSV files and images.
 - **Responsive** : Designed for phone, tablet, desktop screens.
 - **Low-Cost to Host** : Doesn't require any special web hosting (no database or server runtime).
+- **No App Install Needed** : When people arrive at an event, they usually don't have time to download and install an iOS or Android app to find their schedule and rooms.
 
 ## Data Files
 All of the CSV files are sample data, and should be customized for your event.  The map image example used here was freely available on the web, and should be replaced by your own.
