@@ -1,6 +1,11 @@
 # Generator for DI Event Schedule and Map
 
-This project was originally created for the 2018 Destination Imagination Capital Region Tournament, and the goal is to make this generic enough to leverage for any DI tourney.  It generates a set of static HTML pages for a tournament schedule and map.  
+This project was originally created for the 2018 Destination Imagination Capital Region Tournament, and the goal is to make this generic enough to leverage for any DI tourney.  It generates a set of static HTML pages for a tournament schedule and map.  The document links below are for more detail.
+
+ - [App Overview](docs/README-site.md)
+ - [Generation Process Overview](docs/README-process.md)
+
+![Site Example](docs/SiteSummaryImages.jpg).
 
 ## Features
 - **Data-Driven** : No coding required, just edit CSV files and images.
