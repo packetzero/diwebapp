@@ -2,6 +2,7 @@
 const path = require('path');
 const fs = require('fs');
 const _ = require('underscore');
+
 _.templateSettings.interpolate = /\{\{(.+?)\}\}/g;
 
 const TOPDIR=path.resolve(__dirname, '..');
@@ -39,6 +40,7 @@ let gMapRooms={};
 
 let schoolList = [];
 let schoolMap = {};
+let gLog = "";
 
 const EMOJI={ balance: "&#x2696;", page: "&#x1F4C4;", map: "&#x1F5FA;"};
 
@@ -251,7 +253,6 @@ function Team(cols)
 
     if (this.tctime != null) {
         this.tctime.loc = this.room.label;
-        this.tctime.mapLink = "/map.html?loc=" + this.room.id;
     }
 
     return this;
@@ -362,11 +363,15 @@ function render(filter, groups)
 
         fs.writeFileSync(filename, s);
 
+        log('Wrote output',group.path);
+
+
         // render a page for each team
 
         for (let j=0; j < group.rows.length; j++) {
             let team = group.rows[j];
-            filename = path.join(parentDir,"teams", team.teamid + ".htm");
+            filename = path.join("teams", team.teamid + ".htm");
+            filepath = path.join(parentDir,filename);
 
             let pageTitle = gStringData['TitlePrefixTeam'] + team.teamid;
             let s = renderHeaderTemplate(pageTitle);
@@ -375,7 +380,9 @@ function render(filter, groups)
 
             s += renderFooterTemplate();
 
-            fs.writeFileSync(filename, s);
+            fs.writeFileSync(filepath, s);
+
+            log('Wrote output/',filename);
         }
     }
 
@@ -390,16 +397,22 @@ function renderMap()
 
     // build a JSON array of room assignments
     let s = "'TEST':{x:0,y:0,level:'',label:'TEST'}";
+    let numMissingCoords = 0;
     let i = -1;
     for (key in gMapRooms) {
       i++;
       let room = gMapRooms[key];
+      if (!room.mapx || (room.mapx == '0' && room.mapy == '0')) { numMissingCoords++; }
       s += ",'" + room.id + "' : { x: " + room.mapx + ",y:" + room.mapy + ",level:'" + room.buildingLevel + "',label:'" + room.label + "' }\n";
     }
 
     gStringData['_rooms_'] = s;
 
     let htm = renderTemplate(gTemplates['map.html'], gStringData);
+
+    if (numMissingCoords > 0) { log('WARN: ',numMissingCoords,' rooms missing map coordinates'); }
+
+    log('wrote output/map.html');
 
     fs.writeFileSync(filename, htm);
 
@@ -419,6 +432,7 @@ function generateChallengeIndex(challengeGroups, parentDir)
     s += renderFooterTemplate();
     fs.writeFileSync(filename, s);
 
+    log('Wrote to output/index.htm');
 }
 
 function sortByName(a, b) {
@@ -437,6 +451,8 @@ function generateSchoolPage(schoolList, parentDir)
     s += renderTemplate(gTemplates['schools.html'], gStringData);
     s += renderFooterTemplate();
     fs.writeFileSync(filename, s);
+
+    log('Wrote output/schools.htm - ',gStringData.schools.length,' entries');
 }
 
 function renderGroupHeader(group)
@@ -507,8 +523,6 @@ function addTimes(dest, team, eventType)
     } else {
         // no filter, add all times
         if (team.tctime) dest.push(team.tctime);
-//        if (team.ictime) dest.push(team.ictime);
-//        if (team.checkin) dest.push(team.checkin);
     }
 }
 
@@ -773,7 +787,12 @@ function copyImages(fromdir, todir, force)
   let files = fs.readdirSync(fromdir);
   for (let i=0;i < files.length;i++) {
     let f = files[i];
-    fs.copyFileSync(path.join(fromdir, f), path.join(todir,f));
+    let from = path.join(fromdir, f);
+    let to = path.join(todir,f);
+
+    log('Copying ',f,' to output/images/');
+
+    fs.copyFileSync(from, to);
   }
 }
 
@@ -808,41 +827,72 @@ function loadHtmlTemplates()
     }
   }
 }
+function log(s1,s2,s3)
+{
+  let styleClass = false;
+  if (s1.indexOf('WARN') == 0 ) { styleClass = 'WARN'; }
+  if (s1.indexOf('ERROR') == 0) { styleClass = 'ERROR'; }
+  if (styleClass) {gLog += "<span class='" + styleClass + "'>"; }
+  gLog += s1;
+  if (s2) gLog += s2;
+  if (s3) gLog += s3;
+  if (styleClass) {gLog += "</span>"; }
+  gLog += "\n";
+}
 
-// =======================================================
-// Execution starts here
-// =======================================================
+function generate()
+{
+  gLog = '';
+  // create output dir
 
-// create output dir
+  if (!fs.existsSync(OUTDIR)) {
+    log('Creating output directory');
+    fs.mkdirSync(OUTDIR);
+  }
 
-if (!fs.existsSync(OUTDIR)) fs.mkdirSync(OUTDIR);
+  // copy images to output/images
+  copyImages(path.join(TOPDIR,'images'), path.join(OUTDIR,"images"), true);
 
-// copy images to output/images
+  // load general strings like region, event date, title prefixes
 
-copyImages(path.join(TOPDIR,'images'), path.join(OUTDIR,"images"), true);
+  gStringData = JSON.parse(fs.readFileSync(path.join(DATADIR,"strings.json"), 'utf8'));
+  log('loaded strings.json - ',Object.keys(gStringData).length, ' entries.');
 
-// load general strings like region, event date, title prefixes
+  // load HTML templates
 
-gStringData = JSON.parse(fs.readFileSync(path.join(DATADIR,"strings.json"), 'utf8'));
+  loadHtmlTemplates();
 
-// load HTML templates
+  // load CSV files
 
-loadHtmlTemplates();
+  mapChallenges = loadChallenges(path.join(DATADIR,'challenges.csv'));
+  log('loaded challenges.csv - ',Object.keys(mapChallenges).length, ' rows.');
 
-// load CSV files
+  gMapRooms = loadRoomAssignments(path.join(DATADIR,'room_assignments.csv'));
+  log('loaded room_assignments.csv - ',Object.keys(gMapRooms).length, ' rows.');
 
-mapChallenges = loadChallenges(path.join(DATADIR,'challenges.csv'));
+  schedRows = loadSchedule(path.join(DATADIR,'schedfinal.csv'));
+  log('loaded schedfinal.csv - ',schedRows.length, ' rows.');
 
-gMapRooms = loadRoomAssignments(path.join(DATADIR,'room_assignments.csv'));
+  // render static HTML files
 
-schedRows = loadSchedule(path.join(DATADIR,'schedfinal.csv'));
+  let filter = {challenge:null, panel:null, team:null, school: null};
 
-// render static HTML files
+  filterAndRender(schedRows, filter);
 
-let filter = {challenge:null, panel:null, team:null, school: null};
+  renderMap();
 
-filterAndRender(schedRows, filter);
+  return gLog;
+}
 
-renderMap();
+module.exports = {
+  generate : generate
+};
 
-process.exit(0);
+if (require.main === module) {
+  // =======================================================
+  // Execution starts here
+  // =======================================================
+
+  generate();
+  process.exit(0);
+}
