@@ -568,7 +568,7 @@ function Group(challenge, panel, level, icon, challengeObj)
     this.icon = icon;
     this.name = challenge + ' ' + level;
     this.path = "/tc/" + doEscape(challenge.toLowerCase()) + '_' + level.toLowerCase();
-    if (panel) this.path += '_' + panel;
+    //if (panel) this.path += '_' + panel;
     this.path += ".htm";
     return this;
 }

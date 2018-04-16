@@ -22,18 +22,19 @@ All of the CSV files are sample data, and should be customized for your event.  
 - **room_assignments.csv** : Lists the actual rooms used, as well as the map coordinates for each.
 - **images/map.jpg** : Update this with the map image (can be GIF, PNG, JPG) for your own venue.  Actual filename specified in strings.json.
 
-## Docker Dependency
-This project has several techie dependencies (Node.js, javascript modules), and using Docker will take care of all of those details for us.
+## Installing Node.js Runtime Dependency
 
-[Docker for MacOS](https://store.docker.com/editions/community/docker-ce-desktop-mac)
+First you need to install Node/npmjs dependency.
 
-[Docker for Windows](https://store.docker.com/editions/community/docker-ce-desktop-windows)
+Visit [npmjs.com downloads](https://www.npmjs.com/get-npm) and click on the 'Download node.js and npm' button.  
 
-## Running using Docker
+## Running the service
 
-On MacOS, double-clicking the **run-docker.command** script will open up a terminal windows and run a small web server inside a Docker container.
+After that is Node.js is installed, double-clicking on the **run-windows.bat** (on windows) or **run-mac.command** (on MacOS) script will open up a terminal window and run a small web server that your browser can interact with.
 
-Then you set your browser to [http://localhost:8080/](http://localhost:8080/).
+## Interacting with the generator service
+
+One the service is running, you set your browser to [http://localhost:8080/](http://localhost:8080/).
 
 You should see the simple page with a single button like the following.
 ![Generator Home](docs/ssGeneratorHomePage.png)
