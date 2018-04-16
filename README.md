@@ -1,17 +1,22 @@
 # Generator for DI Event Schedule and Map
 
-This project was originally created for the 2018 Destination Imagination Capital Region Tournament, and the goal is to make this generic enough to leverage for any DI tourney.  It generates a set of static HTML pages for a tournament schedule and map.  The document links below are for more detail.
-
- - [App Overview](docs/README-site.md)
- - [Generation Process Overview](docs/README-process.md)
-
-![Site Example](docs/SiteSummaryImages.jpg).
+This is a tool that uses your event schedule spreadsheet data to generate HTML files, which you then host on a website.  This project was originally created for the 2018 Destination Imagination Capital Region Tournament, and the goal is to make this generic enough to leverage for any DI tourney.
 
 ## Features
 - **Data-Driven** : No coding required, just edit CSV files and images.
 - **Responsive** : Designed for phone, tablet, desktop screens.
 - **Low-Cost to Host** : Doesn't require any special web hosting (no database or server runtime).
 - **No App Install Needed** : When people arrive at an event, they usually don't have time to download and install an iOS or Android app to find their schedule and rooms.
+- **Share Link** : A couple of days prior to the event, you can email out the link to your website to team managers, and even provide each team a link to their specific page details (times and map locations).  They can share the link with friends and family coming to watch their performances, so they will be less frazzled on the day of the event.
+
+## Documentation
+
+ - [App Overview](docs/README-site.md)
+ - [Generation Process Overview](docs/README-process.md)
+
+## Screenshots of Example Generated Site
+
+![Site Example](docs/SiteSummaryImages.jpg).
 
 ## Data Files
 All of the CSV files are sample data, and should be customized for your event.  The map image example used here was freely available on the web, and should be replaced by your own.
@@ -31,6 +36,10 @@ Visit [npmjs.com downloads](https://www.npmjs.com/get-npm) and click on the 'Dow
 ## Running the service
 
 After that is Node.js is installed, double-clicking on the **run-windows.bat** (on windows) or **run-mac.command** (on MacOS) script will open up a terminal window and run a small web server that your browser can interact with.
+
+On Windows, you will probably be presented with a Firewall dialog (like image below), and you need to click the 'Allow Access' button.
+
+![Windows Firewall dialog](docs/win-firewall-dialog.png)
 
 ## Interacting with the generator service
 
