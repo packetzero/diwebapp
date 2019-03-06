@@ -326,7 +326,7 @@ function addGroupLink(group)
     if (!challengeGroups[cidx]) {
         challengeGroups[cidx] = new ChallengeSection(group);
     }
-    console.log(group);
+    //console.log(group);
 
     challengeGroups[cidx].levels[levelIdx] = new LevelLink(group);
 }
