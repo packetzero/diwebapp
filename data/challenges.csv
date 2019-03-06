@@ -1,10 +1,10 @@
 LevelChar,Level,Name,Color,Icon,Order
-R,Rising Stars,Friends Everywhere,red,icon-R-risingstars.png,0
-RS,Rising Stars,Friends Everywhere,red,icon-R-risingstars.png,0
-A,Technical Challenge,Maze Craze,orange,icon-A-technical.png,1
-B,Scientific,Unlikely Attraction,yellow,icon-B-scientific.png,2
-C,Fine Arts,Change of Tune,blue,icon-C-finearts.png,3
-D,Improvisational,Treasure!,pink,icon-D-improv.png,4
-E,Engineering/Structural,Drop Zone,green,icon-E-engineering.png,5
-P,Outreach/Service,Inside Impact,teal,icon-P-outreach.png,6
+R,Rising Stars,Pop Up,red,icon-R-risingstars.jpg,0
+RS,Rising Stars,Pop Up,red,icon-R-risingstars.jpg,0
+A,Technical Challenge,On Target,orange,icon-A-technical.jpg,1
+B,Scientific,Medical Mystery,yellow,icon-B-scientific.jpg,2
+C,Fine Arts,Game On,blue,icon-C-finearts.jpg,3
+D,Improvisational,Heads Up,pink,icon-D-improv.jpg,4
+E,Engineering/Structural,Monster Effects,green,icon-E-engineering.jpg,5
+P,Outreach/Service,Escape Artists,teal,icon-P-outreach.jpg,6
 X,Extreme,Extreme,black,icon-X-extreme.png,7

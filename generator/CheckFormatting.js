@@ -326,7 +326,6 @@ function addGroupLink(group)
     if (!challengeGroups[cidx]) {
         challengeGroups[cidx] = new ChallengeSection(group);
     }
-    //console.log(group);
 
     challengeGroups[cidx].levels[levelIdx] = new LevelLink(group);
 }
@@ -622,8 +621,6 @@ function addToSchoolList(team)
         schoolMap[team.school] = school;
     }
 
-
-
     let levelIndex = team.level; //levelIndexes[team.level];
     if (!school.levels[levelIndex]) {
         school.levels[levelIndex] = [];
@@ -631,6 +628,56 @@ function addToSchoolList(team)
     school.levels[levelIndex].push(new SchoolTeam(team.teamid, team.teamname, team.challenge));
 }
 
+function checkFormat(filename) {
+    let str = fs.readFileSync(filename).toString();
+
+    let rows = CSVToArray(str, ',');
+    //console.log(rows);
+
+    // filter
+
+
+    for (let i = 0; i < 3; i++) {
+        //checks header for right columns
+        if (i === 0) {
+          if (rows[0][0] == "ICRoom" && rows[0][1] == "Active" && rows[0][2] == "Competitive" && rows[0][3] == "Chall Letter" && rows[0][4] == "Lvl only" && rows[0][5] == "Level" && rows[0][6] == "School" && rows[0][7] == "Town" && rows[0][8] == "Membership Name" && rows[0][9] == "TCRoom" && rows[0][10] == "Manager" && rows[0][11] == "TeamNum" && rows[0][12] == "ICTime") {
+            //checking
+            console.log("Header matches required formatting in " + filename);
+          } else {
+            console.log("The header's formatting doesn't match the requirements in " + filename);
+            return false;
+          }
+          continue;
+        }
+
+        if (rows[i].length < 10) continue; // skip empty rows
+
+        //sanity check on rows
+        if (rows[i][1] == "A") {
+
+          if (rows[i][2] == "YES" || rows[i][2] == "NO") {
+
+            if (rows[i][4] == "EL" || rows[i][4] == "ML" || rows[i][4] == "UL" || rows[i][4] == "SL" || rows[i][4] == "HS" || rows[i][4] == "RS") {
+              console.log("Row checks returned true in " + filename);
+            } else {
+              console.log("Row checks returned false in " + filename + " at column 5");
+              return false;
+            }
+
+          } else {
+            console.log("Row checks returned false in " + filename + " at column 3");
+            return false;
+          }
+
+        }  else {
+        console.log("Row checks returned false in " + filename + " at column 2");
+        return false;
+        }
+
+    }
+
+    return true;
+}
 
 function loadSchedule(filename) {
     let str = fs.readFileSync(filename).toString();
@@ -652,7 +699,6 @@ function loadSchedule(filename) {
 
         result.push(row);
 
-        //console.log(row);
         addToSchoolList(row);
     }
 
@@ -844,21 +890,10 @@ function log(s1,s2,s3)
   gLog += "\n";
 }
 
-function init() {
-  gTemplates = {};
-  gStringData = {};
-  mapChallenges={};
-  gMapRooms={};
-  schoolList = [];
-  schoolMap = {};
-  gLog = "";
-}
-
 function generate()
 {
   gLog = '';
   // create output dir
-  init();
 
   if (!fs.existsSync(OUTDIR)) {
     log('Creating output directory');
@@ -885,8 +920,6 @@ function generate()
   gMapRooms = loadRoomAssignments(path.join(DATADIR,'room_assignments.csv'));
   log('loaded room_assignments.csv - ',Object.keys(gMapRooms).length, ' rows.');
 
-  console.log(gLog);
-
   schedRows = loadSchedule(path.join(DATADIR,'schedfinal.csv'));
   log('loaded schedfinal.csv - ',schedRows.length, ' rows.');
 
@@ -909,7 +942,10 @@ if (require.main === module) {
   // =======================================================
   // Execution starts here
   // =======================================================
-
-  generate();
+  if (checkFormat(path.join(DATADIR,'schedfinal.csv'))) {
+    console.log("formatting is correct");
+  } else {
+    console.log("formatting has an error");
+  }
   process.exit(0);
 }
